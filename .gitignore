@@ -1,0 +1,9 @@
+/target/ 
+*.class
+application-products.log*
+
+*.jar
+*.war
+*.ear
+*.db
+/target/

@@ -1,0 +1,60 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-4.0.xsd 
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-4.0.xsd
+	http://www.springframework.org/schema/tx 
+	http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
+
+	<context:component-scan base-package="br.com.products" />
+
+
+	<bean id="entityManagerFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+
+		<property name="packagesToScan" value="br.com.products.model.entity" />
+
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.connection.driver_class">org.h2.Driver</prop>
+				<prop key="hibernate.connection.url">jdbc:h2:mem:products;INIT=CREATE SCHEMA IF NOT EXISTS products;</prop>
+				<prop key="hibernate.connection.username">sa</prop>
+				<prop key="hibernate.connection.password"></prop>
+				<prop key="hibernate.dialect">org.hibernate.dialect.H2Dialect</prop>
+				<prop key="hibernate.hbm2ddl.auto">create-drop</prop>
+				<prop key="hibernate.show_sql">false</prop>
+				<prop key="hibernate.format_sql">false</prop>
+			</props>
+		</property>
+
+	</bean>
+
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactory" />
+	</bean>
+
+	<!-- start H2 -->
+	<bean id="org.h2.tools.Server" class="org.h2.tools.Server"
+		factory-method="createWebServer" init-method="start">
+		<constructor-arg value="-web,-webPort,8082" />
+	</bean>
+
+	<bean class="org.h2.tools.Server" factory-method="createTcpServer"
+		init-method="start" destroy-method="stop">
+		<constructor-arg>
+			<array>
+				<value>-tcp</value>
+				<value>-tcpAllowOthers</value>
+				<value>-tcpPort</value>
+				<value>8043</value>
+			</array>
+		</constructor-arg>
+	</bean>
+
+	<!-- Enable Annotation based Declarative Transaction Management -->
+	<tx:annotation-driven proxy-target-class="true"
+		transaction-manager="transactionManager" />
+
+</beans>
