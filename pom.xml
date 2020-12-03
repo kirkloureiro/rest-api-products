@@ -180,7 +180,7 @@
 				<configuration>
 					<scanIntervalSeconds>10</scanIntervalSeconds>
 					<webApp>
-						<contextPath>/products</contextPath>
+						<contextPath>/api</contextPath>
 					</webApp>
 				</configuration>
 			</plugin>

@@ -6,4 +6,11 @@ application-products.log*
 *.war
 *.ear
 *.db
+*.iml
 /target/
+
+/.gradle
+/.idea
+/out
+/build
+

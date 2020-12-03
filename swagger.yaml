@@ -1,0 +1,185 @@
+openapi: 3.0.0
+info:
+  version: '1.0.0'
+  title: 'Products API'
+  description: "This is an API which perform CRUD operations on a Product resource using Image as a sub-resource of Product. Some technologies used in this application"
+
+servers:
+  - url: http://localhost:8080/api/products/v1
+    description: Localhost
+
+
+paths: 
+  '/product':
+    post:
+      operationId: postProduct
+      summary: Create a product
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Product"
+      responses:
+        '201':
+          description: Criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'  
+    get:
+      operationId: getProductsList
+      summary: Get Products by filter params
+      parameters:
+        - in: query
+          name: id
+          required: false
+          schema:
+            type: integer
+            example: 53
+        - in: query
+          name: fetchChildProducts
+          required: false
+          schema:
+            type: boolean
+            example: true
+      responses:
+        '200':
+          description: Encontrado com sucesso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '204':
+          description: No content
+  '/product/{id}':
+    get:
+      operationId: getProductById
+      summary: Get Product by id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            example: 53
+      responses:
+        '200':
+          description: Encontrado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'  
+        '404':
+          description: Not found
+    put:
+      operationId: updateProductById
+      summary: Update Product by id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            example: 53
+      responses:
+        '200':
+          description: Atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'  
+        '404':
+          description: Not found
+
+    delete:
+      operationId: deleteProductById
+      summary: Delete Product by id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            example: 53
+      responses:
+        '204':
+          description: removido com sucesso
+        '404':
+          description: não encontrado
+          
+  '/product/{id}/image':
+    post:
+      operationId: postProductImage
+      summary: Post Product Image
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            example: 53
+      responses:
+        '200':
+          description: Encontrado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Image'
+        '201':
+          description: Created
+    get:
+      operationId: getProductImagesList
+      summary: Get Products Images by id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            example: 53
+      responses:
+        '200':
+          description: Encontrado com sucesso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Image'
+        '204':
+          description: No content
+        
+components:
+  schemas:  
+    Product:
+      type: object
+      required:
+        - name
+        - description
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: "ID numérico"
+          example: 5673
+          readOnly: true
+        name:
+          type: string
+        description:
+          type: string
+    Image:
+      type: object
+      required:
+        - name
+        - description
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: "ID numérico"
+          example: 5673
+          readOnly: true
+        type:
+          type: string

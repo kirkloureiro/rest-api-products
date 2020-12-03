@@ -47,69 +47,9 @@ Note: The database is created on deploy and droped on stop. If you want
 disable this feature, go to applicationContext.xml file and change the property hibernate.hbm2ddl.auto.
 
 
-# Exposed services:
+# Exposed Enpoints:
 
-- url: /query
-	-- HTTP Method: GET 
-	-- URL Params: 
-				- fetchChildProducts: type(boolean) (default=false) (optional=true)
-				- fetchImages: type(boolean) (default=false) (optional=true)
-				- fetchParentProdut: type(boolean) (default=false) (optional=true)
-				- id: type(Integer) (default="") (optional=true)
-	-- Response:
-				- Success: 200
-				- Error: 500		 
-	-- Example of use: http://localhost:8080/products/rest/product/query
-	-- Example of use: http://localhost:8080/products/rest/product/query?fetchChildProducts=false&fetchImages=false&fetchParentProdut=false
-	-- Example of use: http://localhost:8080/products/rest/product/query?id=1&fetchImages=true
-	
-	
-- url: /images/{id}
-	-- HTTP Method: GET 
-		-- Accepts: 
-	--- Example of use: http://localhost:8080/products/rest/product/images/1
-	
-	
-- url: /child-products/{id}
-	-- HTTP Method: GET 
-	-- Response:
-				- Success: 200
-				- Error: 500
-	-- Example of use: http://localhost:8080/products/rest/product/child-products/1
-
-	
-- url: /save-product 
-	-- HTTP Method: POST 
-		-- Accepts: text/plain; charset=utf­8
-	-- Response:
-				- Success: 200
-				- Error: 500
-
-				
-- url: /delete-product 
-	-- HTTP Method: POST 
-		-- Accepts: text/plain; charset=utf­8
-	-- Response:
-				- Success: 200
-				- Error: 500
-
-				
-- url: /save-image 
-	-- HTTP Method: POST 
-		-- Accepts: text/plain; charset=utf­8
-	-- Response:
-				- Success: 200
-				- Error: 500
-	
-	
-- url: /delete-image 
-	-- HTTP Method: POST 
-		-- Accepts: text/plain; charset=utf­8
-	-- Response:
-				- Success: 200
-				- Error: 500
-		
-	
+See [swagger.yaml](swagger.yaml)
 	
 # How to run the suite of automated tests
 

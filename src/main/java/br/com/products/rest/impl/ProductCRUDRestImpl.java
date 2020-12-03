@@ -2,13 +2,7 @@ package br.com.products.rest.impl;
 
 import java.util.List;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
@@ -23,7 +17,7 @@ import br.com.products.util.FilterDTO;
 import br.com.products.util.JsonParserUtil;
 
 @Component
-@Path("/product")
+@Path("/products/v1")
 public class ProductCRUDRestImpl implements ProductCRUDRest {
 
 	public Logger logger = Logger.getLogger(this.getClass());
@@ -35,7 +29,7 @@ public class ProductCRUDRestImpl implements ProductCRUDRest {
 	 * {@inheritDoc}
 	 */
 	@GET
-	@Path("/query")
+	@Path("/product")
 	@Override
 	public Response fetchProductByFilter(@DefaultValue("") @QueryParam("id") final String id,
 			 @DefaultValue("false") @QueryParam("fetchChildProducts") final boolean fetchChildProducts,
@@ -49,30 +43,13 @@ public class ProductCRUDRestImpl implements ProductCRUDRest {
 					.setFetchParentProdut(fetchParentProdut);
 			
 			List<Product> products = productCRUDService.findProductsByFilter(filterDTO);
-			return Response.status(Response.Status.OK).entity(JsonParserUtil.parseObjectToJson(products)).build();
+			return Response.status(Response.Status.OK).type("application/json").entity(JsonParserUtil.parseObjectToJson(products)).build();
 		}catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
 		}
 	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@GET
-	@Path("/images/{id}")
-	@Override
-	public Response getAllImageByProductId(@PathParam("id") final String id) {
 
-		try {
-			List<Image> images = productCRUDService.findAllImageByProductId(Long.valueOf(id));
-			return Response.status(Response.Status.OK).entity(JsonParserUtil.parseObjectToJson(images)).build();
-		}catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
-		}
-	}
-	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -93,10 +70,23 @@ public class ProductCRUDRestImpl implements ProductCRUDRest {
 	 * {@inheritDoc}
 	 */
 	@POST
-	@Path("/save-product")
-	@Consumes("text/plain; charset=UTF-8")
+	@Path("/product")
+	@Consumes("application/json; charset=UTF-8")
 	@Override
 	public Response saveProduct(String jsonObjectString) {
+		try {
+			Product product = productCRUDService.createOrUpdateProduct(JsonParserUtil.parseJsonToObject(jsonObjectString, Product.class));
+			return Response.status(Response.Status.CREATED).entity(JsonParserUtil.parseObjectToJson(product)).build();
+		}catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+		}
+	}
+
+	@PUT
+	@Path("/product/{id}")
+	@Consumes("application/json; charset=UTF-8")
+	public Response updateProduct(String jsonObjectString) {
 		try {
 			Product product = productCRUDService.createOrUpdateProduct(JsonParserUtil.parseJsonToObject(jsonObjectString, Product.class));
 			return Response.status(Response.Status.OK).entity(JsonParserUtil.parseObjectToJson(product)).build();
@@ -105,18 +95,18 @@ public class ProductCRUDRestImpl implements ProductCRUDRest {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
 		}
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
-	@POST
-	@Path("/delete-product")
-	@Consumes("text/plain; charset=UTF-8")
+	@DELETE
+	@Path("/product/{id}")
+	@Consumes("application/json; charset=UTF-8")
 	@Override
 	public Response deleteProduct(final String jsonObjectString) {
 		try {
 			productCRUDService.deleteProduct(JsonParserUtil.parseJsonToObject(jsonObjectString, Product.class));
-			return Response.status(Response.Status.OK).entity("Successfully Deleted").build();
+			return Response.status(Response.Status.NO_CONTENT).entity("Successfully Deleted").build();
 		}catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
@@ -127,13 +117,13 @@ public class ProductCRUDRestImpl implements ProductCRUDRest {
 	 * {@inheritDoc}
 	 */
 	@POST
-	@Path("/save-image")
-	@Consumes("text/plain; charset=UTF-8")
+	@Path("/product/{id}/image")
+	@Consumes("application/json; charset=UTF-8")
 	@Override
 	public Response saveImage(String jsonObjectString) {
 		try {
 			Image image = productCRUDService.createOrUpdateImage(JsonParserUtil.parseJsonToObject(jsonObjectString, Image.class));
-			return Response.status(Response.Status.OK).entity(JsonParserUtil.parseObjectToJson(image)).build();
+			return Response.status(Response.Status.CREATED).entity(JsonParserUtil.parseObjectToJson(image)).build();
 		}catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
@@ -143,14 +133,31 @@ public class ProductCRUDRestImpl implements ProductCRUDRest {
 	/**
 	 * {@inheritDoc}
 	 */
-	@POST
-	@Path("/delete-image")
-	@Consumes("text/plain; charset=UTF-8")
+	@DELETE
+	@Path("/product/{id}/image")
+	@Consumes("application/json; charset=UTF-8")
 	@Override
 	public Response deleteImage(final String jsonObjectString) {
 		try {
 			productCRUDService.deleteImage(JsonParserUtil.parseJsonToObject(jsonObjectString, Image.class));
-			return Response.status(Response.Status.OK).entity("Successfully Deleted").build();
+			return Response.status(Response.Status.NO_CONTENT).entity("Successfully Deleted").build();
+		}catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@GET
+	@Path("/product/{id}/image")
+	@Override
+	public Response getAllImageByProductId(@PathParam("id") final String id) {
+
+		try {
+			List<Image> images = productCRUDService.findAllImageByProductId(Long.valueOf(id));
+			return Response.status(Response.Status.OK).entity(JsonParserUtil.parseObjectToJson(images)).build();
 		}catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
